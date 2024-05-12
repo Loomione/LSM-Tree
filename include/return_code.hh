@@ -12,6 +12,7 @@
 #pragma once
 #include <string_view>
 
+namespace lsm_tree {
 enum class RC {
   OK,
   NOT_FOUND,
@@ -44,7 +45,6 @@ enum class RC {
   BAD_CURRENT_FILE,
   NEW_SSTABLE_ERROR,
 };
-
 
 inline auto RcToString(RC rc) -> std::string_view {
   switch (rc) {
@@ -111,3 +111,4 @@ inline auto RcToString(RC rc) -> std::string_view {
   }
   return "UNKNOWN";
 }
+}  // namespace lsm_tree
