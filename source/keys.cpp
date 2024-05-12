@@ -1,6 +1,7 @@
 #include "keys.hh"
 #include <fmt/format.h>
 #include <cstring>
+#include "encode.hh"
 #include "return_code.hh"
 
 namespace lsm_tree {
@@ -154,9 +155,16 @@ auto EasySaveValue(std::string_view rk, std::string_view rv, std::string_view tk
 }
 
 auto EncodeKVPair(const MemKey &key, std::string_view value) -> std::string {
-  return key.ToSSTableKey() + std::string(value);
+  std::string res;
+  EncodeWithPreLen(res, key.ToSSTableKey());
+  EncodeWithPreLen(res, value);
+  return res;
 }
 
-void DecodeKVPair(std::string_view data, MemKey &memkey, std::string &value) {}
-
+void DecodeKVPair(std::string_view data, MemKey &memkey, std::string &value) {
+  string key;
+  auto   pos = DecodeWithPreLen(key, data);
+  memkey.FromSSTableKey(key);
+  DecodeWithPreLen(value, data.substr(pos));
+}
 }  // namespace lsm_tree
