@@ -1,8 +1,8 @@
 #include "keys.hh"
 #include <fmt/format.h>
 #include <cstring>
-#include "encode.hh"
 #include "return_code.hh"
+#include "util/encode.hh"
 
 namespace lsm_tree {
 auto operator<<(std::ostream &os, const MemKey &key) -> std::ostream & {
