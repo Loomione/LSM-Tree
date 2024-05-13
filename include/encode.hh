@@ -4,6 +4,7 @@
 #include <string_view>
 
 namespace lsm_tree {
+
 using std::string;
 using std::string_view;
 void Decode32(const char *src, int *dest);
