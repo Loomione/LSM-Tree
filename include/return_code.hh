@@ -3,10 +3,10 @@
  * @author gusj (guchee@163.com)
  * @brief  Return code
  * @version 0.1
- * @date 
- * 
+ * @date
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #pragma once
@@ -44,6 +44,7 @@ enum class RC {
   BAD_FILE_PATH,
   BAD_CURRENT_FILE,
   NEW_SSTABLE_ERROR,
+  CREATE_FILE_FAILED,
 };
 
 inline auto RcToString(RC rc) -> std::string_view {
@@ -108,6 +109,8 @@ inline auto RcToString(RC rc) -> std::string_view {
       return "BAD_CURRENT_FILE";
     case RC::NEW_SSTABLE_ERROR:
       return "NEW_SSTABLE_ERROR";
+    case RC::CREATE_FILE_FAILED:
+      return "CREATE_FILE_FAILED";
   }
   return "UNKNOWN";
 }
