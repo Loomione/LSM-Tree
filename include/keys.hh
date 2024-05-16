@@ -52,7 +52,8 @@ struct MemKey {
     }
     return *this;
   }
-  MemKey(std::string_view key, int64_t seq, OperatorType type) : user_key_(key), seq_(seq), type_(type) {}
+  MemKey(std::string_view key, int64_t seq, OperatorType type = OperatorType::PUT)
+      : user_key_(key), seq_(seq), type_(type) {}
 
   friend auto operator<<(std::ostream &os, const MemKey &key) -> std::ostream &;
   auto        operator<(const MemKey &other) const -> bool;
