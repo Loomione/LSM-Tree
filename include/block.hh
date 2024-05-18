@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
@@ -27,10 +28,10 @@ class BlockWriter {
   auto Empty() -> bool;
 
  private:
-  uint32_t         entries_num_{0};
-  std::vector<int> restarts_;
-  std::string      last_key_;
-  std::string      buffer_;
+  uint32_t              entries_num_{0};
+  std::string           last_key_;
+  std::string           buffer_;
+  std::vector<uint32_t> restarts_;
 };
 
 class BlockReader : public std::enable_shared_from_this<BlockReader> {
@@ -51,10 +52,8 @@ class BlockReader : public std::enable_shared_from_this<BlockReader> {
 
     auto operator++() -> Iterator &;
     auto operator++(int) -> Iterator;
-
     auto operator<=>(Iterator &rhs) -> int {
       assert(container_ == rhs.container_);
-
       if (cur_entry_ > rhs.cur_entry_) {
         return 1;
       }
@@ -64,21 +63,19 @@ class BlockReader : public std::enable_shared_from_this<BlockReader> {
       return 0;
     }
 
-    auto operator=(const Iterator &rhs) -> Iterator &;
-
     Iterator(const Iterator &rhs);
-
-    auto operator=(Iterator &&rhs) noexcept -> Iterator &;
-
     Iterator(Iterator &&rhs) noexcept;
-
+    auto operator=(Iterator &&rhs) noexcept -> Iterator &;
+    auto operator=(const Iterator &rhs) -> Iterator &;
     auto operator==(Iterator &rhs) -> bool { return container_ == rhs.container_ && cur_entry_ == rhs.cur_entry_; }
-
     auto operator!=(Iterator &rhs) -> bool { return !(*this == rhs); }
-
     auto Valid() -> bool { return valid_; }
+    auto GetContainer() -> shared_ptr<BlockReader> { return container_; }
+    void Fetch();
+    void FetchWithoutValue();
+    auto Key() const -> string_view { return cur_key_; }
+    auto Value() const -> string_view { return cur_value_; }
 
-    auto     GetContainer() -> shared_ptr<BlockReader> { return container_; }
     explicit operator bool() {
       if (!container_) {
         return false;
@@ -90,33 +87,28 @@ class BlockReader : public std::enable_shared_from_this<BlockReader> {
       return true;
     }
 
-    void Fetch();
-    void FetchWithoutValue();
-
-    auto Key() const -> string_view { return cur_key_; }
-    auto Value() const -> string_view { return cur_value_; }
-
    private:
     void SetInValid();
 
-    size_t                  restarts_block_idx_;
-    size_t                  entries_idx_;
-    shared_ptr<BlockReader> container_;
-
-    const char *cur_entry_;
-    int         value_len_;
-    int         unshared_key_len_;
-    int         shared_key_len_;
-
-    bool   valid_;
-    string cur_key_;
-    string cur_value_;
+    int                     value_len_;
+    int                     unshared_key_len_;
+    int                     shared_key_len_;
+    bool                    valid_;
+    string                  cur_key_;
+    string                  cur_value_;
+    size_t                  restarts_block_idx_;  //重启点块的索引，用于定位重启点数组中的位置。
+    size_t                  entries_idx_;         //条目的索引，指示当前迭代到的位置。
+    shared_ptr<BlockReader> container_;           //指向块的智能指针，用于访问块中的数据。
+    const char             *cur_entry_;           //当前条目的指针，用于访问当前条目的内容。
   };
 
+  BlockReader() = default;
   auto Begin() -> Iterator;
   auto End() -> Iterator;
-  BlockReader() = default;
-  auto Init() -> RC;
+  auto Init(
+      string_view data, std::function<int(string_view, string_view)> &&cmp,
+      std::function<RC(string_view, string_view, string_view innner_key, string &key, string &value)> &&handle_result)
+      -> RC;
   auto Get(std::string_view want_key, std::string &key, std::string &value) -> RC;
 
  private:
