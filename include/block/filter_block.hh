@@ -33,6 +33,16 @@ class BloomFilter : public FilterAlgorithm {
   int k_;             // 哈希函数个数
 };
 
+/*
+----------------------------------------------------------------------------------------
+| bitmap1 | bitmap2 | ... | bitmapn |    offset1   |    offset2   | ... |    offsetn   |
+----------------------------------------------------------------------------------------
+|        offset_begin_offset        |                    offsets_len                   |
+----------------------------------------------------------------------------------------
+|             filter_info           |               filter_info_len                    |
+----------------------------------------------------------------------------------------
+*/
+
 class FilterBlockWriter {
  public:
   explicit FilterBlockWriter(unique_ptr<FilterAlgorithm> &&method);
