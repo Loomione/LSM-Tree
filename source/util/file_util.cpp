@@ -491,7 +491,7 @@ MmapReadAbleFile::MmapReadAbleFile(string_view file_name, char *base_addr, size_
 
 MmapReadAbleFile::~MmapReadAbleFile() {
   if (int ret = ::munmap((void *)base_addr_, file_size_); ret) {
-    // TODO(gusj) MLog->error("Failed to munmap file {}, error: {}", file_name_, strerror(errno));
+    MLog->error("Failed to munmap file {}, error: {}", file_name_, strerror(errno));
   }
 }
 
