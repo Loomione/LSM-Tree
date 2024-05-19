@@ -5,6 +5,14 @@
 
 namespace lsm_tree {
 
+
+/*
+------------------------------------------------------------------------------------
+| meta_block_handle | index_block_handle |    magic_number    |    magic_number    |
+------------------------------------------------------------------------------------
+|     8 bytes       |      8 bytes       |        0x12        |        0x34        |
+------------------------------------------------------------------------------------
+*/
 class FooterBlockWriter {
  public:
   auto Add(string_view meta_block_handle, string_view index_block_handle) -> RC;
