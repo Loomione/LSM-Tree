@@ -1,13 +1,10 @@
 add_subdirectory(util)
-
+add_subdirectory(block)
 add_library(lsm
             OBJECT
-            block.cpp
             keys.cpp
-            footer_block.cpp
             memtable.cpp
             wal.cpp
-            filter_block.cpp
             )
 set(ALL_OBJECT_FILES
         ${ALL_OBJECT_FILES} $<TARGET_OBJECTS:lsm>

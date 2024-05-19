@@ -1,4 +1,4 @@
-#include "footer_block.hh"
+#include "block/footer_block.hh"
 
 namespace lsm_tree {
 
