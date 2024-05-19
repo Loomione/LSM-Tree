@@ -7,6 +7,7 @@ add_library(lsm
             footer_block.cpp
             memtable.cpp
             wal.cpp
+            filter_block.cpp
             )
 set(ALL_OBJECT_FILES
         ${ALL_OBJECT_FILES} $<TARGET_OBJECTS:lsm>
