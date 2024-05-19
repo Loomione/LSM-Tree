@@ -12,6 +12,7 @@
 #include <cstring>
 #include <filesystem>
 #include "util/hash_util.hh"
+#include "util/monitor_logger.hh"
 #include "wal.hh"
 namespace lsm_tree {
 
@@ -379,8 +380,7 @@ auto WritAbleFile::Append(string_view data) -> RC {
 auto WritAbleFile::ReName(string_view new_file) -> RC {
   string true_path = FileManager::FixFileName(new_file);
   if (auto ret = rename(file_path_.c_str(), true_path.c_str()); ret != 0) {
-    // TODO(gusj)  实现日志模块之后添加 MLog->error("tempfile name:{} rename to {} failed: {}", file_path_, true_path,
-    // strerror(errno));
+    MLog->error("tempfile name:{} rename to {} failed: {}", file_path_, true_path, strerror(errno));
     return RC::RENAME_FILE_ERROR;
   }
   file_path_ = std::move(true_path);
@@ -420,7 +420,7 @@ auto SeqReadFile::Read(size_t len, string &buffer, string_view &result) -> RC {
   }
   auto ret = ReadN(fd_, buffer.data(), len);
   if (ret == -1) {
-    // TODO(gusj): MLog->error("read_n failed");
+    MLog->error("read_n failed");
     return RC::IO_ERROR;
   }
   result = {buffer.data(), static_cast<size_t>(ret)};
@@ -429,7 +429,7 @@ auto SeqReadFile::Read(size_t len, string &buffer, string_view &result) -> RC {
 
 auto SeqReadFile::Skip(size_t n) -> RC {
   if (lseek(fd_, n, SEEK_CUR) == -1) {
-    //  TODO(gusj) MLog->error("lseek failed");
+    MLog->error("lseek failed");
     return RC::IO_ERROR;
   }
   return RC::OK;
@@ -470,7 +470,7 @@ auto TempFile::Open(string_view dir_path, string_view subfix, TempFile **result)
   int fd = mkstemp(tmp_file.data());
   if (fd == -1) {
     *result = nullptr;
-    // TODO(gusj)MLog->error("mkstemp {} failed: {}", tmp_file, strerror(errno));
+    MLog->error("mkstemp {} failed: {}", tmp_file, strerror(errno));
     return RC::MAKESTEMP_ERROR;
   }
 
