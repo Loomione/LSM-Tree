@@ -121,6 +121,7 @@ set(LSMTREE_SRC_INCLUDE_DIR
         ${PROJECT_SOURCE_DIR}/third_party/spdlog/include
 )
 include_directories(${LSMTREE_SRC_INCLUDE_DIR})
+include_directories(BEFORE source) # This is needed for gtest.
 
 # #####################################################################################################################
 # Other CMake modules
@@ -129,6 +130,7 @@ include_directories(${LSMTREE_SRC_INCLUDE_DIR})
 
 
 set(CMAKE_MODULE_PATH "${DroneSwarm_BUILD_SUPPORT_DIR}/cmake;${CMAKE_MODULE_PATH}")
+add_subdirectory(third_party)
 add_subdirectory(source)
 add_subdirectory(test)
 
