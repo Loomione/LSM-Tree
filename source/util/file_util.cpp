@@ -77,7 +77,7 @@ auto file_manager::Create(string_view path, FileOptions options) -> RC {
 auto file_manager::HandleHomeDir(string_view path) -> string {
   string true_path;
 
-  if (path.starts_with("~")) {
+  if (!path.starts_with("~")) {
     true_path = path;
   } else {
     const char *homedir;
