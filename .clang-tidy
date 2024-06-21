@@ -63,7 +63,7 @@ CheckOptions:
 # WarningsAsErrors: '*'
 HeaderFilterRegex: '/(src|test)/include'
 AnalyzeTemporaryDtors: true
-
+ExcludePaths: 'test/*/*test.cpp'
 #### Disabled checks and why: #####
 #
 # -readability-convert-member-functions-to-static,
