@@ -117,7 +117,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Includes.
 set(LSMTREE_SRC_INCLUDE_DIR 
         ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/third_party/crc32c/include
         ${PROJECT_SOURCE_DIR}/third_party/spdlog/include
 )
 include_directories(${LSMTREE_SRC_INCLUDE_DIR})

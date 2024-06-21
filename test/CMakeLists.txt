@@ -38,7 +38,7 @@ foreach (lsmtree_test_source ${LSMTREE_TEST_SOURCES})
             TIMEOUT 120
             )
 
-    target_link_libraries(${lsmtree_test_name} lsm_tree gtest gmock_main fmt)
+    target_link_libraries(${lsmtree_test_name} lsm_tree gmock_main gtest)
 
     # Set test target properties and dependencies.
     set_target_properties(${lsmtree_test_name}
