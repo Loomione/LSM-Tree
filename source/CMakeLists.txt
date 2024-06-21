@@ -5,6 +5,7 @@ add_library(lsm
             keys.cpp
             memtable.cpp
             wal.cpp
+            worker.cpp
             )
 set(ALL_OBJECT_FILES
         ${ALL_OBJECT_FILES} $<TARGET_OBJECTS:lsm>

@@ -9,7 +9,7 @@ Worker::~Worker() { delete thread_; }
 
 auto Worker::NewBackgroundWorker() -> std::shared_ptr<Worker> {
   auto worker     = std::make_shared<Worker>();
-  worker->thread_ = new std::thread([](Worker *w) { w->Run(); }, worker);
+  worker->thread_ = new std::thread([worker] { worker->Run(); });
   return worker;
 }
 
