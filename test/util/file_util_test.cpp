@@ -25,3 +25,9 @@ TEST(FileUtil, CreatFile) {
     EXPECT_EQ(rc, true);
   }
 }
+
+TEST(FileUtil,FixFileName) {
+  std::string path = "~/spectrum_sensing/gsj/lsm/build/test/files/test.txt";
+  auto str = lsm_tree::file_manager::FixFileName(path);
+  std::cout << str << std::endl;
+}
