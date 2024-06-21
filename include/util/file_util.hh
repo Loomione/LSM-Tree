@@ -30,36 +30,35 @@ class WAL;
 class WALReader;
 class SeqReadFile;
 
-class FileManager {
- public:
-  static auto Exists(string_view path) -> bool;
-  static auto IsDirectory(string_view path) -> bool;
-  static auto Create(string_view path, FileOptions options) -> RC;
-  static auto Destroy(string_view path) -> RC;
-  static auto FixDirName(string_view path) -> string;
-  static auto FixFileName(string_view path) -> string;
-  static auto GetFileSize(string_view path, size_t *size) -> RC;
-  static auto ReName(string_view old_path, string_view new_path) -> RC;
-  static auto HandleHomeDir(string_view path) -> string;
-  /* open */
-  static auto OpenWritAbleFile(string_view filename, WritAbleFile **result) -> RC;
-  static auto OpenTempFile(string_view dir_path, string_view subfix, TempFile **result) -> RC;
-  static auto OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC;
+namespace file_manager {
+auto Exists(string_view path) -> bool;
+auto IsDirectory(string_view path) -> bool;
+auto Create(string_view path, FileOptions options) -> RC;
+auto Destroy(string_view path) -> RC;
+auto FixDirName(string_view path) -> string;
+auto FixFileName(string_view path) -> string;
+auto GetFileSize(string_view path, size_t *size) -> RC;
+auto ReName(string_view old_path, string_view new_path) -> RC;
+auto HandleHomeDir(string_view path) -> string;
+/* open */
+auto OpenWritAbleFile(string_view filename, WritAbleFile **result) -> RC;
+auto OpenTempFile(string_view dir_path, string_view subfix, TempFile **result) -> RC;
+auto OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC;
 
-  static auto OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC;
+auto OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC;
 
-  static auto OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC;
-  static auto OpenRandomAccessFile(string_view filename, RandomAccessFile **result) -> RC;
-  static auto ReadFileToString(string_view filename, string &result) -> RC;
+auto OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC;
+auto OpenRandomAccessFile(string_view filename, RandomAccessFile **result) -> RC;
+auto ReadFileToString(string_view filename, string &result) -> RC;
 
-  static auto OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC;
-  static auto OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC;
-  static auto OpenWALReader(string_view wal_file_path, WALReader **result) -> RC;
+auto OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC;
+auto OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC;
+auto OpenWALReader(string_view wal_file_path, WALReader **result) -> RC;
 
-  static auto ReadDir(string_view directory_path, vector<string> &result) -> RC;
-  static auto ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
-                      const std::function<void(string_view)> &handle_result) -> RC;
-};
+auto ReadDir(string_view directory_path, vector<string> &result) -> RC;
+auto ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
+             const std::function<void(string_view)> &handle_result) -> RC;
+};  // namespace file_manager
 
 /* 缓冲顺序写 */
 class WritAbleFile {
