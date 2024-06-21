@@ -148,6 +148,17 @@ auto file_manager::FixDirName(string_view path) -> string {
   return fix_path;
 }
 
+auto file_manager::GetFileSize(string_view path, size_t *size) -> RC {
+  struct stat file_stat;
+  if (stat(path.data(), &file_stat) != 0) {
+    MLog->error("can not get {} stat, error: {}", path.data(), strerror(errno));
+    *size = 0;
+    return RC::STAT_FILE_ERROR;
+  }
+  *size = file_stat.st_size;
+  return RC::OK;
+}
+
 auto file_manager::OpenWritAbleFile(string_view filename, WritAbleFile **result) -> RC {
   return WritAbleFile::Open(filename, result);
 }
