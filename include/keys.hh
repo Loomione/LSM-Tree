@@ -40,8 +40,10 @@ struct MemKey {
   int64_t      seq_;
   OperatorType type_;
 
-  MemKey()                                        = default;
-  MemKey(const MemKey &other)                     = default;
+  MemKey()                    = default;
+  MemKey(const MemKey &other) = default;
+  MemKey(std::string_view key, int64_t seq, OperatorType type = OperatorType::PUT)
+      : user_key_(key), seq_(seq), type_(type) {}
   auto operator=(const MemKey &other) -> MemKey & = default;
   MemKey(MemKey &&other) noexcept : user_key_(std::move(other.user_key_)), seq_(other.seq_), type_(other.type_) {}
   auto operator=(MemKey &&other) noexcept -> MemKey & {
@@ -52,11 +54,10 @@ struct MemKey {
     }
     return *this;
   }
-  MemKey(std::string_view key, int64_t seq, OperatorType type = OperatorType::PUT)
-      : user_key_(key), seq_(seq), type_(type) {}
 
   friend auto operator<<(std::ostream &os, const MemKey &key) -> std::ostream &;
   auto        operator<(const MemKey &other) const -> bool;
+  auto        operator>(const MemKey &other) const -> bool { return other < *this; }
   auto        ToSSTableKey() const -> std::string;
   void        FromSSTableKey(std::string_view key);
   auto        Size() const -> size_t { return user_key_.size() + sizeof(seq_) + sizeof(type_); }

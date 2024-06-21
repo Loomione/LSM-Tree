@@ -6,7 +6,7 @@
 
 namespace lsm_tree {
 auto operator<<(std::ostream &os, const MemKey &key) -> std::ostream & {
-  return os << fmt::format("@MemKey [user_key_:{} seq_:{} op_type_:{}]", key.user_key_, key.seq_,
+  return os << fmt::format("@MemKey [user_key: {} seq: {} op_type: {}]", key.user_key_, key.seq_,
                            key.type_ == OperatorType::DELETE ? "OP_DELETE" : "OP_PUT");
 }
 
