@@ -46,7 +46,7 @@ auto WAL::Close() -> RC { return wal_file_->Close(); }
 
 auto WAL::Drop() -> RC {
   // MLog->info("Drop WAL file {}", wal_file_->GetPath());
-  return file_manager::Destroy(wal_file_->GetPath());
+  return FileManager::Destroy(wal_file_->GetPath());
 }
 
 /*
@@ -101,7 +101,7 @@ auto WALReader::ReadRecord(string &record) -> RC {
 
 auto WALReader::Drop() -> RC {
   //   MLog->info("Drop WAL file {}", wal_file_->GetPath());
-  return file_manager::Destroy(wal_file_->GetPath());
+  return FileManager::Destroy(wal_file_->GetPath());
 }
 
 auto WALReader::Close() -> RC { return wal_file_->Close(); }

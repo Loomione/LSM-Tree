@@ -18,7 +18,7 @@ namespace lsm_tree {
 
 /*
 **********************************************************************************************************************************************
-* file_manager
+*  FileManager
 **********************************************************************************************************************************************
 */
 
@@ -29,12 +29,12 @@ namespace lsm_tree {
  * @return true
  * @return false
  */
-auto file_manager::Exists(string_view path) -> bool {
+auto FileManager::Exists(string_view path) -> bool {
   struct stat buffer;
   return stat(path.data(), &buffer) == 0;
 }
 
-auto file_manager::IsDirectory(string_view path) -> bool {
+auto FileManager::IsDirectory(string_view path) -> bool {
   struct stat buffer;
   if (stat(path.data(), &buffer) == 0) {
     return S_ISDIR(buffer.st_mode);
@@ -48,7 +48,7 @@ auto file_manager::IsDirectory(string_view path) -> bool {
  * @param options 创建文件或目录的选项。
  * @return 表示操作成功或失败的结果代码。
  */
-auto file_manager::Create(string_view path, FileOptions options) -> RC {
+auto FileManager::Create(string_view path, FileOptions options) -> RC {
   switch (options) {
     case FileOptions::DIR_:
       if (auto err = mkdir(path.data(), 0755); err) {
@@ -74,7 +74,7 @@ auto file_manager::Create(string_view path, FileOptions options) -> RC {
  * @param path 要处理的输入路径。
  * @return 如果适用，则用主目录替换后的修改后的路径。
  */
-auto file_manager::HandleHomeDir(string_view path) -> string {
+auto FileManager::HandleHomeDir(string_view path) -> string {
   string true_path;
 
   if (!path.starts_with("~")) {
@@ -100,7 +100,7 @@ auto file_manager::HandleHomeDir(string_view path) -> string {
  * @param path 要销毁的目录的路径。
  * @return 如果成功销毁目录，则返回 RC::OK，否则返回 RC::DESTROY_DIRECTORY_FAILED。
  */
-auto file_manager::Destroy(string_view path) -> RC {
+auto FileManager::Destroy(string_view path) -> RC {
   path = HandleHomeDir(path);
   if (IsDirectory(path)) {
     if (auto err = RemoveDirectory(path.data()); err) {
@@ -114,7 +114,7 @@ auto file_manager::Destroy(string_view path) -> RC {
   return RC::OK;
 }
 
-auto file_manager::FixFileName(string_view path) -> string {
+auto FileManager::FixFileName(string_view path) -> string {
   if (path.starts_with("~")) {
     return HandleHomeDir(path);
   }
@@ -132,7 +132,7 @@ auto file_manager::FixFileName(string_view path) -> string {
  * @param path 要修复的目录路径。
  * @return 带有斜杠结尾的修复后的目录路径。
  */
-auto file_manager::FixDirName(string_view path) -> string {
+auto FileManager::FixDirName(string_view path) -> string {
   if (path.empty()) {
     return ".";
   }
@@ -148,26 +148,38 @@ auto file_manager::FixDirName(string_view path) -> string {
   return fix_path;
 }
 
-auto file_manager::GetFileSize(string_view path, size_t *size) -> RC {
+/**
+ * @brief 获取指定文件的大小。
+ *
+ * 此函数使用 `stat` 系统调用获取指定文件的文件状态信息，并从中提取文件大小。
+ * 如果 `stat` 调用失败，则函数会记录错误信息并返回一个错误码，同时将 `size` 设置为 0。
+ *
+ * @param path 文件路径，类型为 `string_view`，表示要获取大小的文件。
+ * @param size 引用类型参数，用于存储获取到的文件大小。
+ * @return RC 返回操作的结果状态：
+ *         - `RC::OK` 表示成功获取文件大小。
+ *         - `RC::STAT_FILE_ERROR` 表示获取文件状态信息失败。
+ */
+auto FileManager::GetFileSize(string_view path, size_t &size) -> RC {
   struct stat file_stat;
   if (stat(path.data(), &file_stat) != 0) {
     MLog->error("can not get {} stat, error: {}", path.data(), strerror(errno));
-    *size = 0;
+    size = 0;
     return RC::STAT_FILE_ERROR;
   }
-  *size = file_stat.st_size;
+  size = file_stat.st_size;
   return RC::OK;
 }
 
-auto file_manager::OpenWritAbleFile(string_view filename, WritAbleFile **result) -> RC {
+auto FileManager::OpenWritAbleFile(string_view filename, std::unique_ptr<WritAbleFile> &result) -> RC {
   return WritAbleFile::Open(filename, result);
 }
 
-auto file_manager::OpenTempFile(string_view dir_path, string_view subfix, TempFile **result) -> RC {
+auto FileManager::OpenTempFile(string_view dir_path, string_view subfix, std::unique_ptr<TempFile> &result) -> RC {
   return TempFile::Open(dir_path, subfix, result);
 }
 
-auto file_manager::OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC {
+auto FileManager::OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC {
   int fd = ::open(filename.data(), O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
   if (fd < 0) {
     *result = nullptr;
@@ -177,7 +189,7 @@ auto file_manager::OpenAppendOnlyFile(string_view filename, WritAbleFile **resul
   return RC::OK;
 }
 
-auto file_manager::OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC {
+auto FileManager::OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC {
   int fd = ::open(filename.data(), O_RDONLY | O_CLOEXEC);
   if (fd < 0) {
     *result = nullptr;
@@ -187,7 +199,7 @@ auto file_manager::OpenSeqReadFile(string_view filename, SeqReadFile **result) -
   return RC::OK;
 }
 
-auto file_manager::OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC {
+auto FileManager::OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC {
   RC  rc = RC::OK;
   int fd = ::open(file_name.data(), O_RDONLY | O_CLOEXEC);
   if (fd < 0) {
@@ -195,7 +207,7 @@ auto file_manager::OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile 
     return RC::OPEN_FILE_ERROR;
   }
   size_t file_size = 0;
-  if (rc = GetFileSize(file_name, &file_size); rc != RC::OK) {
+  if (rc = GetFileSize(file_name, file_size); rc != RC::OK) {
     // MLog->error("Failed to open mmap file {}, error: {}", file_name, strrc(rc));
     return rc;
   }
@@ -213,7 +225,7 @@ auto file_manager::OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile 
   return rc;
 }
 
-auto file_manager::ReadFileToString(string_view filename, string &result) -> RC {
+auto FileManager::ReadFileToString(string_view filename, string &result) -> RC {
   MmapReadAbleFile *mmap_readable_file{nullptr};
   RC                rc{RC::OK};
   if (rc = OpenMmapReadAbleFile(filename, &mmap_readable_file); rc != RC::OK) {
@@ -231,7 +243,7 @@ auto file_manager::ReadFileToString(string_view filename, string &result) -> RC 
   return rc;
 }
 
-auto file_manager::OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC {
+auto FileManager::OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC {
   /* open append only file for wal */
   string        wal_file_name = WalFile(WalDir(dbname), log_number);
   WritAbleFile *wal_file{nullptr};
@@ -245,12 +257,12 @@ auto file_manager::OpenWAL(string_view dbname, int64_t log_number, WAL **result)
   return RC::OK;
 }
 
-auto file_manager::OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC {
+auto FileManager::OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC {
   /* open append only file for wal */
   return OpenWALReader(WalFile(WalDir(dbname), log_number), result);
 }
 
-auto file_manager::OpenWALReader(string_view wal_file_path, WALReader **result) -> RC {
+auto FileManager::OpenWALReader(string_view wal_file_path, WALReader **result) -> RC {
   /* open append only file for wal */
   SeqReadFile *seq_read_file = nullptr;
   if (auto rc = OpenSeqReadFile(wal_file_path, &seq_read_file); rc != RC::OK) {
@@ -261,7 +273,7 @@ auto file_manager::OpenWALReader(string_view wal_file_path, WALReader **result) 
 }
 
 /* 获得一个文件夹的所有子文件 opendir+readdir+closedir */
-auto file_manager::ReadDir(string_view directory_path, std::vector<std::string> &result) -> RC {
+auto FileManager::ReadDir(string_view directory_path, std::vector<std::string> &result) -> RC {
   result.clear();
   DIR *dir = opendir(directory_path.data());
   if (dir == nullptr) {
@@ -275,8 +287,8 @@ auto file_manager::ReadDir(string_view directory_path, std::vector<std::string> 
   return RC::OK;
 }
 
-auto file_manager::ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
-                           const std::function<void(string_view)> &handle_result) -> RC {
+auto FileManager::ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
+                          const std::function<void(string_view)> &handle_result) -> RC {
   DIR *dir = opendir(directory_path.data());
   if (dir == nullptr) {
     return RC::IO_ERROR;
@@ -305,14 +317,15 @@ WritAbleFile::WritAbleFile(string_view file_path, int fd) : file_path_(file_path
  * @param result 指向将保存创建的 WritableFile 对象的指针的指针。
  * @return 如果成功打开文件，则返回 RC::OK，否则返回 RC::OPEN_FILE_ERROR。
  */
-auto WritAbleFile::Open(string_view file_path, WritAbleFile **result) -> RC {
-  int fd = ::open(file_path.data(), O_TRUNC | O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
+auto WritAbleFile::Open(string_view file_path, std::unique_ptr<WritAbleFile> &result) -> RC {
+  // int fd = ::open(file_path.data(), O_WRONLY | O_CREAT | O_CLOEXEC | O_APPEND, 0644);  // 追加写文件
+  int fd = ::open(file_path.data(), O_TRUNC | O_WRONLY | O_CREAT | O_CLOEXEC, 0644);  //文件内容将被清空再打开
   if (fd < 0) {
-    *result = nullptr;
+    result.reset();
     return RC::OPEN_FILE_ERROR;
   }
 
-  *result = new WritAbleFile(file_path, fd);
+  result.reset(new WritAbleFile(file_path, fd));
   return RC::OK;
 }
 
@@ -389,7 +402,7 @@ auto WritAbleFile::Append(string_view data) -> RC {
 }
 
 auto WritAbleFile::ReName(string_view new_file) -> RC {
-  string true_path = file_manager::FixFileName(new_file);
+  string true_path = FileManager::FixFileName(new_file);
   if (auto ret = rename(file_path_.c_str(), true_path.c_str()); ret != 0) {
     MLog->error("tempfile name:{} rename to {} failed: {}", file_path_, true_path, strerror(errno));
     return RC::RENAME_FILE_ERROR;
@@ -473,14 +486,14 @@ TempFile::TempFile(const std::string &file_path, int fd) : WritAbleFile(file_pat
  * @param result 指向将设置为新创建的 TempFile 对象的 TempFile 指针的指针。
  * @return RC 表示操作成功或失败的返回码。
  */
-auto TempFile::Open(string_view dir_path, string_view subfix, TempFile **result) -> RC {
-  string tmp_file(file_manager::FixDirName(dir_path));
+auto TempFile::Open(string_view dir_path, string_view subfix, std::unique_ptr<TempFile> &result) -> RC {
+  string tmp_file(FileManager::FixDirName(dir_path));
   tmp_file += subfix;
   tmp_file += "XXXXXX";
 
   int fd = mkstemp(tmp_file.data());
   if (fd == -1) {
-    *result = nullptr;
+    result.reset();
     MLog->error("mkstemp {} failed: {}", tmp_file, strerror(errno));
     return RC::MAKESTEMP_ERROR;
   }
@@ -488,7 +501,7 @@ auto TempFile::Open(string_view dir_path, string_view subfix, TempFile **result)
   std::string file_path =
       std::filesystem::read_symlink(std::filesystem::path("/proc/self/fd/") / std::to_string(fd)).string();
   // MLog->info("create new tempfile: {}", file_path);
-  *result = new TempFile(file_path, fd);
+  result.reset(new TempFile(file_path, fd));
   return RC::OK;
 }
 

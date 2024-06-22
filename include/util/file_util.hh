@@ -3,6 +3,7 @@
 #include <fmt/ostream.h>
 #include <openssl/sha.h>
 #include <functional>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <string_view>
@@ -30,40 +31,42 @@ class WAL;
 class WALReader;
 class SeqReadFile;
 
-namespace file_manager {
-auto Exists(string_view path) -> bool;
-auto IsDirectory(string_view path) -> bool;
-auto Create(string_view path, FileOptions options) -> RC;
-auto Destroy(string_view path) -> RC;
-auto FixDirName(string_view path) -> string;
-auto FixFileName(string_view path) -> string;
-auto GetFileSize(string_view path, size_t *size) -> RC;
-auto ReName(string_view old_path, string_view new_path) -> RC;
-auto HandleHomeDir(string_view path) -> string;
-/* open */
-auto OpenWritAbleFile(string_view filename, WritAbleFile **result) -> RC;
-auto OpenTempFile(string_view dir_path, string_view subfix, TempFile **result) -> RC;
-auto OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC;
-
-auto OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC;
-
-auto OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC;
-auto OpenRandomAccessFile(string_view filename, RandomAccessFile **result) -> RC;
-auto ReadFileToString(string_view filename, string &result) -> RC;
-
-auto OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC;
-auto OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC;
-auto OpenWALReader(string_view wal_file_path, WALReader **result) -> RC;
-
-auto ReadDir(string_view directory_path, vector<string> &result) -> RC;
-auto ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
-             const std::function<void(string_view)> &handle_result) -> RC;
-};  // namespace file_manager
-
-/* 缓冲顺序写 */
-class WritAbleFile {
+class FileManager {
  public:
-  WritAbleFile(string_view file_path, int fd);
+  static auto Exists(string_view path) -> bool;
+  static auto IsDirectory(string_view path) -> bool;
+  static auto Create(string_view path, FileOptions options) -> RC;
+  static auto Destroy(string_view path) -> RC;
+  static auto FixDirName(string_view path) -> string;
+  static auto FixFileName(string_view path) -> string;
+  static auto GetFileSize(string_view path, size_t &size) -> RC;
+  static auto ReName(string_view old_path, string_view new_path) -> RC;
+  static auto HandleHomeDir(string_view path) -> string;
+  /* open */
+  static auto OpenWritAbleFile(string_view filename, std::unique_ptr<WritAbleFile> &result) -> RC;
+  static auto OpenTempFile(string_view dir_path, string_view subfix, std::unique_ptr<TempFile> &result) -> RC;
+  static auto OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC;
+  static auto OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC;
+  static auto OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC;
+  static auto OpenRandomAccessFile(string_view filename, RandomAccessFile **result) -> RC;
+  static auto OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC;
+  static auto OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC;
+  static auto OpenWALReader(string_view wal_file_path, WALReader **result) -> RC;
+
+  static auto ReadFileToString(string_view filename, string &result) -> RC;
+  static auto ReadDir(string_view directory_path, vector<string> &result) -> RC;
+  static auto ReadDir(string_view directory_path, const std::function<bool(string_view)> &filter,
+                      const std::function<void(string_view)> &handle_result) -> RC;
+};  // namespace  FileManager
+
+/* 缓冲顺序写
+WritAbleFile::Open打开的文件，使用了 O_TRUNC 标志，如果该文件已经存在，文件内容将被清空，文件长度将被截断为
+0 字节。新的数据写入操作将从文件的开头开始。
+*/
+class WritAbleFile {
+  friend class FileManager;
+
+ public:
   WritAbleFile(const WritAbleFile &)                     = delete;
   auto operator=(const WritAbleFile &) -> WritAbleFile & = delete;
   virtual ~WritAbleFile();
@@ -72,18 +75,18 @@ class WritAbleFile {
   auto Flush() -> RC;
   auto Sync() -> RC;
   auto ReName(string_view new_file) -> RC;
-
-  auto        GetPath() -> string;
-  static auto Open(string_view file_path, WritAbleFile **result) -> RC;
+  auto GetPath() -> string;
 
  public:
   static constexpr size_t K_WRIT_ABLE_FILE_BUFFER_SIZE = 1 << 16;  // 64KB
 
  protected:
+  WritAbleFile(string_view file_path, int fd);
+  static auto Open(string_view file_path, std::unique_ptr<WritAbleFile> &result) -> RC;
   std::string file_path_;                         // 文件路径
   int         fd_;                                // 文件描述符
   bool        closed_;                            // 是否关闭
-  size_t      pos_;                               // 当前写入位置
+  size_t      pos_;                               // 当前缓冲区写入位置
   char        buf_[K_WRIT_ABLE_FILE_BUFFER_SIZE]; /* buffer */
 };
 
@@ -105,9 +108,11 @@ class SeqReadFile {
 
 /* 临时写文件 */
 class TempFile : public WritAbleFile {
- public:
+  friend class FileManager;
+
+ private:
   TempFile(const std::string &file_path, int fd);
-  static auto Open(string_view dir_path, string_view subfix, TempFile **result) -> RC;
+  static auto Open(string_view dir_path, string_view subfix, std::unique_ptr<TempFile> &result) -> RC;
 };
 
 /* mmap 读 */
