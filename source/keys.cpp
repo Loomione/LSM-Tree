@@ -154,6 +154,21 @@ auto EasySaveValue(std::string_view rk, std::string_view rv, std::string_view tk
   return SaveResultIfUserKeyMatch(rk, rv, tk, dk, dv);
 }
 
+/**
+ * @brief 将键值对编码为字符串格式。
+ * 
+ * 此函数接受一个键和值，并将它们编码为一个字符串。编码格式为：
+ * 1. 键的长度前缀，后跟键的内容。
+ * 2. 值的长度前缀，后跟值的内容。
+ * 
+ * 具体来说，该函数会首先将键转换为 SSTable 格式，然后对键和值进行带有长度前缀的编码。
+ *  ------------------------------------------------------------
+ *  | key_length | key_content | value_length | value_content |
+ * -----------------------------------------------------------
+ * @param key 要编码的键，类型为 MemKey。
+ * @param value 要编码的值，类型为 std::string_view。
+ * @return std::string 返回编码后的字符串，包含键和值的长度前缀和内容。
+ */
 auto EncodeKVPair(const MemKey &key, std::string_view value) -> std::string {
   std::string res;
   EncodeWithPreLen(res, key.ToSSTableKey());
