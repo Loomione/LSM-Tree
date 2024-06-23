@@ -22,7 +22,7 @@ using std::unique_ptr;
 enum WALDataType { wal_kv_ };
 class WAL {
  public:
-  explicit WAL(WritAbleFile *wal_file);
+  explicit WAL(std::unique_ptr<WritAbleFile> &wal_file);
   virtual auto AddRecord(string_view data) -> RC;
 
   auto Sync() -> RC;
@@ -38,7 +38,7 @@ class WAL {
 class SeqReadFile;
 class WALReader {
  public:
-  explicit WALReader(SeqReadFile *wal_file);
+  explicit WALReader(std::unique_ptr<SeqReadFile> &wal_file);
   auto ReadRecord(string &record) -> RC;
   auto Drop() -> RC;
   auto Close() -> RC;

@@ -45,13 +45,13 @@ class FileManager {
   /* open */
   static auto OpenWritAbleFile(string_view filename, std::unique_ptr<WritAbleFile> &result) -> RC;
   static auto OpenTempFile(string_view dir_path, string_view subfix, std::unique_ptr<TempFile> &result) -> RC;
-  static auto OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC;
-  static auto OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC;
+  static auto OpenAppendOnlyFile(string_view filename, std::unique_ptr<WritAbleFile> &result) -> RC;
+  static auto OpenSeqReadFile(string_view filename, std::unique_ptr<SeqReadFile> &result) -> RC;
   static auto OpenMmapReadAbleFile(string_view file_name, MmapReadAbleFile **result) -> RC;
   static auto OpenRandomAccessFile(string_view filename, RandomAccessFile **result) -> RC;
   static auto OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC;
-  static auto OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC;
-  static auto OpenWALReader(string_view wal_file_path, WALReader **result) -> RC;
+  static auto OpenWALReader(string_view dbname, int64_t log_number, std::unique_ptr<WALReader> &result) -> RC;
+  static auto OpenWALReader(string_view wal_file_path, std::unique_ptr<WALReader> &result) -> RC;
 
   static auto ReadFileToString(string_view filename, string &result) -> RC;
   static auto ReadDir(string_view directory_path, vector<string> &result) -> RC;
@@ -92,8 +92,9 @@ class WritAbleFile {
 
 /* 顺序读 */
 class SeqReadFile {
+  friend class FileManager;
+
  public:
-  SeqReadFile(string_view filename, int fd);
   ~SeqReadFile();
   auto Read(size_t len, string &buffer, string_view &result) -> RC;
   auto Skip(size_t n) -> RC;
@@ -101,6 +102,7 @@ class SeqReadFile {
   auto Close() -> RC;
 
  private:
+  SeqReadFile(string_view filename, int fd);
   string filename_;
   int    fd_;
   bool   closed_;

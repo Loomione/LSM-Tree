@@ -9,7 +9,7 @@ namespace lsm_tree {
 **********************************************************************************************************************************************
 */
 
-WAL::WAL(WritAbleFile *wal_file) { wal_file_.reset(wal_file); }
+WAL::WAL(std::unique_ptr<WritAbleFile> &wal_file) { wal_file_ = std::move(wal_file); }
 
 auto WAL::AddRecord(string_view data) -> RC {
   RC rc = RC::OK;
@@ -55,7 +55,7 @@ auto WAL::Drop() -> RC {
 **********************************************************************************************************************************************
 */
 
-WALReader::WALReader(SeqReadFile *wal_file) { wal_file_.reset(wal_file); }
+WALReader::WALReader(std::unique_ptr<SeqReadFile> &wal_file) { wal_file_ = std::move(wal_file); }
 
 auto WALReader::ReadRecord(string &record) -> RC {
   RC          rc{RC::OK};

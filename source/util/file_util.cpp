@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <memory>
 #include "util/hash_util.hh"
 #include "util/monitor_logger.hh"
 #include "wal.hh"
@@ -179,23 +180,23 @@ auto FileManager::OpenTempFile(string_view dir_path, string_view subfix, std::un
   return TempFile::Open(dir_path, subfix, result);
 }
 
-auto FileManager::OpenAppendOnlyFile(string_view filename, WritAbleFile **result) -> RC {
+auto FileManager::OpenAppendOnlyFile(string_view filename, std::unique_ptr<WritAbleFile> &result) -> RC {
   int fd = ::open(filename.data(), O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
   if (fd < 0) {
-    *result = nullptr;
+    result = nullptr;
     return RC::OPEN_FILE_ERROR;
   }
-  *result = new WritAbleFile(filename, fd);
+  result.reset(new WritAbleFile(filename, fd));
   return RC::OK;
 }
 
-auto FileManager::OpenSeqReadFile(string_view filename, SeqReadFile **result) -> RC {
+auto FileManager::OpenSeqReadFile(string_view filename, std::unique_ptr<SeqReadFile> &result) -> RC {
   int fd = ::open(filename.data(), O_RDONLY | O_CLOEXEC);
   if (fd < 0) {
-    *result = nullptr;
+    result = nullptr;
     return RC::OPEN_FILE_ERROR;
   }
-  *result = new SeqReadFile(filename, fd);
+  result.reset(new SeqReadFile(filename, fd));
   return RC::OK;
 }
 
@@ -246,9 +247,9 @@ auto FileManager::ReadFileToString(string_view filename, string &result) -> RC {
 auto FileManager::OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC {
   /* open append only file for wal */
   string        wal_file_name = WalFile(WalDir(dbname), log_number);
-  WritAbleFile *wal_file{nullptr};
+  std::unique_ptr<WritAbleFile> wal_file;
 
-  if (auto rc = OpenAppendOnlyFile(wal_file_name, &wal_file); rc != RC::OK) {
+  if (auto rc = OpenAppendOnlyFile(wal_file_name, wal_file); rc != RC::OK) {
     // MLog->error("open wal file {} failed: {} {}", wal_file_name, strrc(rc), strerror(errno));
     return rc;
   }
@@ -257,18 +258,18 @@ auto FileManager::OpenWAL(string_view dbname, int64_t log_number, WAL **result) 
   return RC::OK;
 }
 
-auto FileManager::OpenWALReader(string_view dbname, int64_t log_number, WALReader **result) -> RC {
+auto FileManager::OpenWALReader(string_view dbname, int64_t log_number, std::unique_ptr<WALReader> &result) -> RC {
   /* open append only file for wal */
   return OpenWALReader(WalFile(WalDir(dbname), log_number), result);
 }
 
-auto FileManager::OpenWALReader(string_view wal_file_path, WALReader **result) -> RC {
+auto FileManager::OpenWALReader(string_view wal_file_path, std::unique_ptr<WALReader> &result) -> RC {
   /* open append only file for wal */
-  SeqReadFile *seq_read_file = nullptr;
-  if (auto rc = OpenSeqReadFile(wal_file_path, &seq_read_file); rc != RC::OK) {
+  std::unique_ptr<SeqReadFile> seq_read_file;
+  if (auto rc = OpenSeqReadFile(wal_file_path, seq_read_file); rc != RC::OK) {
     return rc;
   }
-  *result = new WALReader(seq_read_file);
+  result.reset(new WALReader(seq_read_file));
   return RC::OK;
 }
 
@@ -607,9 +608,9 @@ auto WriteN(int fd, const char *buf, size_t len) -> ssize_t {
     ssize_t r = write(fd, buf + n, len - n);
     if (r < 0) {
       if (errno == EINTR) {
-        continue;
+        continue;  // 如果被信号中断，重试写入
       }
-      return -1;
+      return -1; // 发生其他错误，返回 -1
     }
     n += r;
   }
