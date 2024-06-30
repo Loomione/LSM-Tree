@@ -1,8 +1,8 @@
+file(GLOB SRC_FILES *.cpp *.cc)
+
 add_library(block
             OBJECT
-            block.cpp
-            filter_block.cpp
-            footer_block.cpp
+            ${SRC_FILES}
             )
 
 set(ALL_OBJECT_FILES
