@@ -28,6 +28,16 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get update && sudo apt-get install -y libfmt-dev
 
+    - name: Install crc32c library
+      run: |
+        git clone https://github.com/google/crc32c.git
+        cd crc32c
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=/usr -DCRC32C_BUILD_TESTS=0 -DCRC32C_BUILD_BENCHMARKS=0 ..
+        make all
+        sudo make install
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
