@@ -30,7 +30,7 @@ jobs:
 
     - name: Install crc32c library
       run: |
-        git clone https://github.com/google/crc32c.git
+        git clone --recurse-submodules https://github.com/google/crc32c.git
         cd crc32c
         mkdir build
         cd build
