@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
+cmake_minimum_required(VERSION 3.15)
+
 include(GoogleTest)
 
 file(GLOB_RECURSE LSMTREE_TEST_SOURCES "${PROJECT_SOURCE_DIR}/test/*/*test.cpp")
@@ -11,9 +13,8 @@ file(GLOB_RECURSE LSMTREE_TEST_SOURCES "${PROJECT_SOURCE_DIR}/test/*/*test.cpp")
 # #########################################
 # "make check-tests"
 # #########################################
-add_custom_target(build-tests COMMAND ${CMAKE_CTEST_COMMAND} --show-only)
+add_custom_target(build-tests)
 add_custom_target(check-tests COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
-
 
 # #########################################
 # "make XYZ_test"
@@ -46,6 +47,9 @@ foreach (lsmtree_test_source ${LSMTREE_TEST_SOURCES})
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
             COMMAND ${lsmtree_test_name}
             )
+
+    # Add each test to the build-tests target to ensure they are all built with 'make build-tests'
+    add_dependencies(build-tests ${lsmtree_test_name})
 endforeach ()
 
 
