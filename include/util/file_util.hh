@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include "keys.hh"
+#include "memtable/keys.hh"
 #include "return_code.hh"
 
 namespace lsm_tree {

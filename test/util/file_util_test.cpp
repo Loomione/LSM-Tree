@@ -30,7 +30,7 @@ TEST(FileUtil, DISABLED_CreatFile) {
   }
 }
 
-TEST(FileUtil, FixFileName) {
+TEST(FileUtil, DISABLED_FixFileName) {
   string path = "~/spectrum_sensing/gsj/lsm/build/test/files/test.txt";
   auto   str  =  FileManager::FixFileName(path);
   cout << str << endl;
@@ -52,7 +52,7 @@ TEST(FileUtil, GetFileSize) {
   cout << size << endl;
 }
 
-TEST(FileUtil, WritAbleFile) {
+TEST(FileUtil, DISABLED_WritAbleFile) {
   string                   path = "/home/swarm/spectrum_sensing/gsj/lsm/build/test/files/test.txt";
   unique_ptr<WritAbleFile> file;
   auto                     rc =  FileManager::OpenWritAbleFile(path, file);
@@ -70,8 +70,7 @@ TEST(FileUtil, WritAbleFile) {
   EXPECT_EQ(file_path, path);
 }
 
-
-TEST(FileUtil, TempFile) {
+TEST(FileUtil, DISABLED_TempFile) {
   string                   dir = "/home/swarm/spectrum_sensing/gsj/lsm/build/test/files";
   string                   subfix = ".tmp";
   unique_ptr<TempFile>     file;

@@ -9,10 +9,9 @@
  *
  */
 
-#include "memtable.hh"
+#include "memtable/memtable.hh"
 #include <mutex>
 #include <shared_mutex>
-#include "keys.hh"
 #include "util/monitor_logger.hh"
 
 namespace lsm_tree {

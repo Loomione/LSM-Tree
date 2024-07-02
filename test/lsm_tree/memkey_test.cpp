@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "keys.hh"
+#include "memtable/keys.hh"
 
 using namespace lsm_tree;
 using namespace std;

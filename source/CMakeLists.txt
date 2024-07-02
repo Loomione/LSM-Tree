@@ -1,9 +1,8 @@
 add_subdirectory(util)
 add_subdirectory(block)
+add_subdirectory(memtable)
 add_library(lsm
             OBJECT
-            keys.cpp
-            memtable.cpp
             wal.cpp
             worker.cpp
             )
