@@ -49,9 +49,12 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Test
+      
+    - name: BuildTest
       # Run your program's tests
       run: cmake --build ${{github.workspace}}/build --target build-tests
-           cmake --build ${{github.workspace}}/build --target test
+           
+    - name: Test
+      # Run your program's tests
+      run: cmake --build ${{github.workspace}}/build --target test
           
