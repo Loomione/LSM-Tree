@@ -1,5 +1,4 @@
-#ifndef LSM_TREE_SKIPLISTS_H
-#define LSM_TREE_SKIPLISTS_H
+#pragma once
 
 #include <cstdlib>
 #include <ctime>
@@ -9,7 +8,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <vector>
-
+namespace lsm_tree {
 const int   MAX_LEVEL = 16;
 const float P         = 0.5;
 
@@ -243,5 +242,4 @@ typename SkipList<K, V>::iterator SkipList<K, V>::lower_bound(K key) {
   x = x->forward[0];
   return std::list<std::pair<K, V>>::iterator(x);
 }
-
-#endif  // LSM_TREE_SKIPLISTS_H
+}  // namespace lsm_tree

@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20) # Compile as C++17.
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # Require C++17 support.
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE STRING "C++ compiler" FORCE)
 
-link_directories(/usr/lib/gcc/aarch64-linux-gnu/10)
 project(LSM-Tree
         VERSION 3.1 
         LANGUAGES CXX)
