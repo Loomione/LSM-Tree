@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 
 using namespace std;
-
+using namespace lsm_tree;
 class SkipListTest : public ::testing::Test {
  protected:
   void SetUp() override {
