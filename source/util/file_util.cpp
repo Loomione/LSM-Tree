@@ -246,7 +246,7 @@ auto FileManager::ReadFileToString(string_view filename, string &result) -> RC {
 
 auto FileManager::OpenWAL(string_view dbname, int64_t log_number, WAL **result) -> RC {
   /* open append only file for wal */
-  string        wal_file_name = WalFile(WalDir(dbname), log_number);
+  string                        wal_file_name = WalFile(WalDir(dbname), log_number);
   std::unique_ptr<WritAbleFile> wal_file;
 
   if (auto rc = OpenAppendOnlyFile(wal_file_name, wal_file); rc != RC::OK) {
@@ -610,7 +610,7 @@ auto WriteN(int fd, const char *buf, size_t len) -> ssize_t {
       if (errno == EINTR) {
         continue;  // 如果被信号中断，重试写入
       }
-      return -1; // 发生其他错误，返回 -1
+      return -1;  // 发生其他错误，返回 -1
     }
     n += r;
   }

@@ -156,11 +156,11 @@ auto EasySaveValue(std::string_view rk, std::string_view rv, std::string_view tk
 
 /**
  * @brief 将键值对编码为字符串格式。
- * 
+ *
  * 此函数接受一个键和值，并将它们编码为一个字符串。编码格式为：
  * 1. 键的长度前缀，后跟键的内容。
  * 2. 值的长度前缀，后跟值的内容。
- * 
+ *
  * 具体来说，该函数会首先将键转换为 SSTable 格式，然后对键和值进行带有长度前缀的编码。
  *  ------------------------------------------------------------
  *  | key_length | key_content | value_length | value_content |

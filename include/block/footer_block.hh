@@ -5,7 +5,6 @@
 
 namespace lsm_tree {
 
-
 /*
 ------------------------------------------------------------------------------------
 | meta_block_handle | index_block_handle |    magic_number    |    magic_number    |
