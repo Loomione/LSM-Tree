@@ -63,8 +63,8 @@ auto MemTable::ForEachNoLock(std::function<RC(const MemKey &key, string_view val
 
 /* 一般是 IMEMTABLE 进行 BUILD 不需要加锁 */
 auto MemTable::BuildSSTable(string_view dbname, FileMetaData **meta_data_pointer) -> RC {
-    // TODO (gsj)
-    return RC::OK;
+  // TODO(gsj): 123
+  return RC::OK;
 }
 
 auto MemTable::GetMemTableSize() -> size_t {

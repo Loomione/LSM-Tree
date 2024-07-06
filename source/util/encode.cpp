@@ -53,6 +53,6 @@ auto DecodeWithPreLen(string &dest, string_view data) -> int {
  * @param src
  * @param dest
  */
-void Decode64(const char *src, int64_t *dest) { *dest = *(int64_t *)(src); }
+void Decode64(const char *src, int64_t *dest) { *dest = *reinterpret_cast<const int64_t *>(src); }
 
 }  // namespace lsm_tree

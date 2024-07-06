@@ -14,6 +14,7 @@
 #include <list>
 #include <mutex>
 #include <unordered_map>
+#include <utility>
 namespace lsm_tree {
 
 class NullLock {

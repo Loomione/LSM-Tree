@@ -45,7 +45,7 @@ TEST(MemKey, Compare) {
   auto inner_key2 = mem_key2.ToSSTableKey();
   auto inner_key3 = mem_key3.ToSSTableKey();
   auto ret        = CmpInnerKey(inner_key1, inner_key2);
-  EXPECT_TRUE(ret > 0);
+  EXPECT_GT(ret, 0);
   ret = CmpInnerKey(inner_key3, inner_key1);
-  EXPECT_TRUE(ret < 0);
+  EXPECT_LT(ret, 0);
 }

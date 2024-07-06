@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include "options.hh"
 #include "spdlog/spdlog.h"
@@ -19,5 +20,4 @@ class MonitorLogger {
 
 #define MLogger MonitorLogger::Logger()
 #define MLog MonitorLogger::Logger().logger_
-
 }  // namespace lsm_tree

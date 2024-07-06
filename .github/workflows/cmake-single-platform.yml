@@ -49,7 +49,19 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      
+    
+    - name: Check Format
+      working-directory: ${{github.workspace}}/build
+      run: make check-format
+
+    - name: Check Lint
+      working-directory: ${{github.workspace}}/build
+      run: make check-lint
+
+    - name: Check Clang Tidy
+      working-directory: ${{github.workspace}}/build
+      run: make check-clang-tidy
+    
     - name: BuildTest
       # Run your program's tests
       run: cmake --build ${{github.workspace}}/build --target build-tests
