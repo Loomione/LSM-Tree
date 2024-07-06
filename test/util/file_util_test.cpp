@@ -48,7 +48,7 @@ TEST(FileUtil, FixDirName) {
 TEST(FileUtil, GetFileSize) {
   string path = "/home/swarm/spectrum_sensing/gsj/lsm/source/util/file_util.cpp";
   size_t size = 0;
-  auto   rc   =  FileManager::GetFileSize(path, size);
+  FileManager::GetFileSize(path, size);
   cout << size << endl;
 }
 

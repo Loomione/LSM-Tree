@@ -180,7 +180,7 @@ auto BlockReader::BsearchRestartPoint(string_view key, int *index) -> RC {
 auto BlockReader::GetInternal(string_view inner_key, const std::function<RC(string_view, string_view)> &handle_result)
     -> RC {
   int restarts_len = static_cast<int>(restarts_.size());
-  int key_len      = static_cast<int>(inner_key.length());
+  [[maybe_unused]]int key_len      = static_cast<int>(inner_key.length());
   int index        = 0;
   /* 二分查找最近的小于 key 的重启点 如果 key 越界了，那就直接返回没找到 */
   auto rc = BsearchRestartPoint(inner_key, &index);
