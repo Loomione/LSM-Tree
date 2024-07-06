@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # Require C++17 support.
 set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE STRING "C++ compiler" FORCE)
 
 
-project(LSM-Tree
+project(LSMTree
         VERSION 3.1 
         LANGUAGES CXX)
 
@@ -27,7 +27,7 @@ if(EXISTS "${PATH_TO_CMAKELISTS_TXT}")
     Some junk files were created in this folder (CMakeCache.txt, CMakeFiles); you should delete those.")
 endif()
 
-set(LSM-Tree_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
+set(LSMTree_CLANG_SEARCH_PATH "/usr/local/bin" "/usr/bin" "/usr/local/opt/llvm/bin" "/usr/local/opt/llvm@14/bin"
         "/opt/homebrew/opt/llvm@14/bin/")
 
 
@@ -43,48 +43,48 @@ enable_testing()
 # attempt to find the binary if user did not specify
 find_program(CLANG_FORMAT_BIN
         NAMES clang-format clang-format-12 clang-format-14
-        HINTS ${LSM-Tree_CLANG_SEARCH_PATH})
+        HINTS ${LSMTree_CLANG_SEARCH_PATH})
 
 if("${CLANG_FORMAT_BIN}" STREQUAL "CLANG_FORMAT_BIN-NOTFOUND")
-        message(WARNING "LSM-Tree/main couldn't find clang-format.")
+        message(WARNING "LSMTree/main couldn't find clang-format.")
 else()
-        message(STATUS "LSM-Tree/main found clang-format at ${CLANG_FORMAT_BIN}")
+        message(STATUS "LSMTree/main found clang-format at ${CLANG_FORMAT_BIN}")
 endif()
 
 # attempt to find the binary if user did not specify
 find_program(CLANG_TIDY_BIN
         NAMES clang-tidy clang-tidy-14
-        HINTS ${LSM-Tree_CLANG_SEARCH_PATH})
+        HINTS ${LSMTree_CLANG_SEARCH_PATH})
 
 if("${CLANG_TIDY_BIN}" STREQUAL "CLANG_TIDY_BIN-NOTFOUND")
-        message(WARNING "LSM-Tree/main couldn't find clang-tidy.")
+        message(WARNING "LSMTree/main couldn't find clang-tidy.")
 else()
         # Output compile_commands.json
         set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-        message(STATUS "LSM-Tree/main found clang-tidy at ${CLANG_TIDY_BIN}")
+        message(STATUS "LSMTree/main found clang-tidy at ${CLANG_TIDY_BIN}")
 endif()
 
 find_program(CLANG_APPLY_REPLACEMENTS_BIN
         NAMES clang-apply-replacements clang-apply-replacements-14
-        HINTS ${LSM-Tree_CLANG_SEARCH_PATH})
+        HINTS ${LSMTree_CLANG_SEARCH_PATH})
 
 if("${CLANG_APPLY_REPLACEMENTS_BIN}" STREQUAL "CLANG_APPLY_REPLACEMENTS_BIN-NOTFOUND")
-        message(WARNING "LSM-Tree/main couldn't find clang-apply-replacements.")
+        message(WARNING "LSMTree/main couldn't find clang-apply-replacements.")
 else()
         # Output compile_commands.json
         set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-        message(STATUS "LSM-Tree/main found clang-apply-replacements at ${CLANG_APPLY_REPLACEMENTS_BIN}")
+        message(STATUS "LSMTree/main found clang-apply-replacements at ${CLANG_APPLY_REPLACEMENTS_BIN}")
 endif()
 
 # cpplint
 find_program(CPPLINT_BIN
         NAMES cpplint cpplint.py
-        HINTS "${LSM-Tree_BUILD_SUPPORT_DIR}")
+        HINTS "${LSMTree_BUILD_SUPPORT_DIR}")
 
 if("${CPPLINT_BIN}" STREQUAL "CPPLINT_BIN-NOTFOUND")
-        message(WARNING "LSM-Tree/main couldn't find cpplint.")
+        message(WARNING "LSMTree/main couldn't find cpplint.")
 else()
-        message(STATUS "LSM-Tree/main found cpplint at ${CPPLINT_BIN}")
+        message(STATUS "LSMTree/main found cpplint at ${CPPLINT_BIN}")
 endif()
 
 
@@ -128,7 +128,7 @@ include_directories(BEFORE source) # This is needed for gtest.
 # #####################################################################################################################
 
 
-set(CMAKE_MODULE_PATH "${DroneSwarm_BUILD_SUPPORT_DIR}/cmake;${CMAKE_MODULE_PATH}")
+set(CMAKE_MODULE_PATH "${LSMTREE_BUILD_SUPPORT_DIR}/cmake;${CMAKE_MODULE_PATH}")
 add_subdirectory(third_party)
 add_subdirectory(source)
 add_subdirectory(test)
@@ -180,7 +180,7 @@ file(GLOB_RECURSE LSMTREE_LINT_FILES
 # Balancing act: cpplint.py takes a non-trivial time to launch,
 # so process 12 files per invocation, while still ensuring parallelism
 add_custom_target(check-lint echo '${LSMTREE_LINT_FILES}' | xargs -n12 -P8
-        ${CPPLINT_BIN}
+        ${CMAKE_CURRENT_SOURCE_DIR}/script/cpplint.py
         --verbose=2 --quiet
         --linelength=120
         --filter=-legal/copyright,-build/header_guard,-runtime/references # https://github.com/cpplint/cpplint/issues/148

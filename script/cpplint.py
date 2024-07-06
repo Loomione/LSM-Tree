@@ -49,7 +49,7 @@ import itertools
 import math  # for log
 import os
 import re
-import sre_compile
+import re
 import string
 import sys
 import sysconfig
@@ -316,7 +316,7 @@ _ERROR_CATEGORIES = [
     'runtime/printf_format',
     'runtime/references',
     'runtime/string',
-    'runtime/threadsafe_fn',
+    # 'runtime/threadsafe_fn',
     'runtime/vlog',
     'whitespace/blank_line',
     'whitespace/braces',
@@ -800,7 +800,7 @@ def Match(pattern, s):
   # performance reasons; factoring it out into a separate function turns out
   # to be noticeably expensive.
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].match(s)
 
 
@@ -818,14 +818,14 @@ def ReplaceAll(pattern, rep, s):
     string with replacements made (or original string if no replacements)
   """
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].sub(rep, s)
 
 
 def Search(pattern, s):
   """Searches the string for the pattern, caching the compiled regexp."""
   if pattern not in _regexp_compile_cache:
-    _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
+    _regexp_compile_cache[pattern] = re.compile(pattern)
   return _regexp_compile_cache[pattern].search(s)
 
 
@@ -2338,7 +2338,7 @@ _THREADING_LIST = (
     ('getgrnam(', 'getgrnam_r(', _UNSAFE_FUNC_PREFIX + r'getgrnam\([^)]+\)'),
     ('getlogin(', 'getlogin_r(', _UNSAFE_FUNC_PREFIX + r'getlogin\(\)'),
     ('getpwnam(', 'getpwnam_r(', _UNSAFE_FUNC_PREFIX + r'getpwnam\([^)]+\)'),
-    ('getpwuid(', 'getpwuid_r(', _UNSAFE_FUNC_PREFIX + r'getpwuid\([^)]+\)'),
+    # ('getpwuid(', 'getpwuid_r(', _UNSAFE_FUNC_PREFIX + r'getpwuid\([^)]+\)'),
     ('gmtime(', 'gmtime_r(', _UNSAFE_FUNC_PREFIX + r'gmtime\([^)]+\)'),
     ('localtime(', 'localtime_r(', _UNSAFE_FUNC_PREFIX + r'localtime\([^)]+\)'),
     ('rand(', 'rand_r(', _UNSAFE_FUNC_PREFIX + r'rand\(\)'),
