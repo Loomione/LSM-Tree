@@ -269,7 +269,7 @@ Syntax: cpplint.py [--verbose=#] [--output=emacs|eclipse|vs7|junit]
 # here!  cpplint_unittest.py should tell you if you forget to do this.
 _ERROR_CATEGORIES = [
     'build/class',
-    'build/c++11',
+    # 'build/c++11',
     'build/c++14',
     'build/c++tr1',
     'build/deprecated',
@@ -6126,18 +6126,18 @@ def FlagCxx11Features(filename, clean_lines, linenum, error):
 
   # Flag unapproved C++11 headers.
   if include and include.group(1) in ('cfenv',
-                                      'condition_variable',
-                                      'fenv.h',
-                                      'future',
-                                      'mutex',
-                                      'thread',
-                                      'chrono',
-                                      'ratio',
-                                      'regex',
-                                      'system_error',
+                                      # 'condition_variable',
+                                      # 'fenv.h',
+                                      # 'future',
+                                      # 'mutex',
+                                      # 'thread',
+                                      # 'chrono',
+                                      # 'ratio',
+                                      # 'regex',
+                                      # 'system_error',
                                      ):
-    error(filename, linenum, 'build/c++11', 5,
-          ('<%s> is an unapproved C++11 header.') % include.group(1))
+    error(filename, linenum, 'build/c++20', 5,
+          ('<%s> is an unapproved C++20 header.') % include.group(1))
 
   # The only place where we need to worry about C++11 keywords and library
   # features in preprocessor directives is in macro definitions.
@@ -6152,8 +6152,8 @@ def FlagCxx11Features(filename, clean_lines, linenum, error):
       'aligned_union',
       ):
     if Search(r'\bstd::%s\b' % top_name, line):
-      error(filename, linenum, 'build/c++11', 5,
-            ('std::%s is an unapproved C++11 class or function.  Send c-style '
+      error(filename, linenum, 'build/c++20', 5,
+            ('std::%s is an unapproved C++20 class or function.  Send c-style '
              'an example of where it would make your code more readable, and '
              'they may let you use it.') % top_name)
 

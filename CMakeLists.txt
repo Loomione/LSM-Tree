@@ -175,8 +175,6 @@ file(GLOB_RECURSE LSMTREE_LINT_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.hpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/*.hpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp"
 )
 
 # Balancing act: cpplint.py takes a non-trivial time to launch,

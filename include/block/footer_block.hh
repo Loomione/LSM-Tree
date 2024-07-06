@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "block.hh"
 #include "return_code.hh"
 

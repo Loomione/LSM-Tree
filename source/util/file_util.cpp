@@ -320,7 +320,7 @@ WritAbleFile::WritAbleFile(string_view file_path, int fd) : file_path_(file_path
  */
 auto WritAbleFile::Open(string_view file_path, std::unique_ptr<WritAbleFile> &result) -> RC {
   // int fd = ::open(file_path.data(), O_WRONLY | O_CREAT | O_CLOEXEC | O_APPEND, 0644);  // 追加写文件
-  int fd = ::open(file_path.data(), O_TRUNC | O_WRONLY | O_CREAT | O_CLOEXEC, 0644);  //文件内容将被清空再打开
+  int fd = ::open(file_path.data(), O_TRUNC | O_WRONLY | O_CREAT | O_CLOEXEC, 0644);  // 文件内容将被清空再打开
   if (fd < 0) {
     result.reset();
     return RC::OPEN_FILE_ERROR;
@@ -515,7 +515,7 @@ MmapReadAbleFile::MmapReadAbleFile(string_view file_name, char *base_addr, size_
     : file_name_(file_name), base_addr_(base_addr), file_size_(file_size) {}
 
 MmapReadAbleFile::~MmapReadAbleFile() {
-  if (int ret = ::munmap((void *)base_addr_, file_size_); ret) {
+  if (int ret = ::munmap(reinterpret_cast<void *>(base_addr_), file_size_); ret) {
     MLog->error("Failed to munmap file {}, error: {}", file_name_, strerror(errno));
   }
 }
@@ -620,7 +620,7 @@ auto WriteN(int fd, const char *buf, size_t len) -> ssize_t {
 auto ReadN(int fd, const char *buf, size_t len) -> ssize_t {
   ssize_t n = 0;
   while (n < len) {
-    ssize_t r = read(fd, (void *)(buf + n), len - n);
+    ssize_t r = read(fd, const_cast<void *>(static_cast<const void *>(buf + n)), len - n);
     if (r < 0) {
       if (errno == EINTR) {
         continue;

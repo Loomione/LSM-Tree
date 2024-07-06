@@ -77,7 +77,7 @@ void BlockWriter::Reset() {
   last_key_.clear();
   entries_num_ = 0;
   buffer_.clear();
-};
+}
 
 auto BlockWriter::Empty() -> bool { return entries_num_ == 0; }
 

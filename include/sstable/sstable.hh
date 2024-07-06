@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "block/block.hh"
 #include "block/filter_block.hh"
 #include "block/footer_block.hh"

@@ -96,10 +96,10 @@ class BlockReader : public std::enable_shared_from_this<BlockReader> {
     bool                    valid_;
     string                  cur_key_;
     string                  cur_value_;
-    size_t                  restarts_block_idx_;  //重启点块的索引，用于定位重启点数组中的位置。
-    size_t                  entries_idx_;         //条目的索引，指示当前迭代到的位置。
-    shared_ptr<BlockReader> container_;           //指向块的智能指针，用于访问块中的数据。
-    const char             *cur_entry_;           //当前条目的指针，用于访问当前条目的内容。
+    size_t                  restarts_block_idx_;  // 重启点块的索引，用于定位重启点数组中的位置。
+    size_t                  entries_idx_;         // 条目的索引，指示当前迭代到的位置。
+    shared_ptr<BlockReader> container_;           // 指向块的智能指针，用于访问块中的数据。
+    const char             *cur_entry_;           // 当前条目的指针，用于访问当前条目的内容。
   };
 
   BlockReader() = default;
