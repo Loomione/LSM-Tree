@@ -144,10 +144,10 @@ add_subdirectory(test)
 
 string(CONCAT LSMTREE_FORMAT_DIRS
         "${CMAKE_CURRENT_SOURCE_DIR}/source,"
-        "${CMAKE_CURRENT_SOURCE_DIR}/test,"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include,"
 )
 
-set(LSMTREE_BUILD_SUPPORT_DIR "${CMAKE_SOURCE_DIR}/build_support")
+set(LSMTREE_BUILD_SUPPORT_DIR "${CMAKE_SOURCE_DIR}/script")
 
 # Runs clang format and updates files in place.
 add_custom_target(format ${LSMTREE_BUILD_SUPPORT_DIR}/run_clang_format.py
@@ -173,6 +173,7 @@ add_custom_target(check-format ${LSMTREE_BUILD_SUPPORT_DIR}/run_clang_format.py
 # #########################################
 file(GLOB_RECURSE LSMTREE_LINT_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.hpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hh"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/test/*.hpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp"
