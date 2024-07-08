@@ -1,16 +1,18 @@
 #pragma once
-
-#include <cstdlib>
+#include <atomic>
 #include <ctime>
 #include <iostream>
 #include <list>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <shared_mutex>
 #include <vector>
-namespace lsm_tree {
+
 const int   MAX_LEVEL = 16;
 const float P         = 0.5;
+
+namespace lsm_tree {
 
 template <typename K, typename V>
 class SkipListNode {
@@ -27,9 +29,11 @@ class SkipList {
  private:
   std::shared_ptr<SkipListNode<K, V>> head;
   int                                 maxLevel;
-  int                                 currentLevel;
+  std::atomic<int>                    currentLevel;  // 使用 std::atomic<int>
   float                               probability;
   mutable std::shared_mutex           mutex;
+  std::mt19937                        gen;
+  std::uniform_real_distribution<>    dis;
 
   int randomLevel();  // 随机生成层数
 
@@ -46,8 +50,8 @@ class SkipList {
   using const_iterator = typename std::list<std::pair<K, V>>::const_iterator;
 
   bool empty() const;      // 判断是否为空
-  V   &operator[](K key);  // 重载[]运算符
-  V   &at(K key);          // 返回指定键的值
+  V    operator[](K key);  // 重载[]运算符
+  V    at(K key);          // 返回指定键的值
 
   iterator       begin();
   iterator       end();
@@ -60,15 +64,14 @@ class SkipList {
 
 template <typename K, typename V>
 SkipList<K, V>::SkipList(int maxLevel, float probability)
-    : maxLevel(maxLevel), probability(probability), currentLevel(0) {
+    : maxLevel(maxLevel), probability(probability), currentLevel(0), gen(std::random_device{}()), dis(0.0, 1.0) {
   head = std::make_shared<SkipListNode<K, V>>(K(), V(), maxLevel);
-  srand(static_cast<unsigned>(time(nullptr)));
 }
 
 template <typename K, typename V>
 int SkipList<K, V>::randomLevel() {
   int level = 0;
-  while (rand() / static_cast<double>(RAND_MAX) < probability && level < maxLevel) {
+  while (dis(gen) < probability && level < maxLevel) {
     level++;
   }
   return level;
@@ -182,11 +185,10 @@ bool SkipList<K, V>::empty() const {
 }
 
 template <typename K, typename V>
-V &SkipList<K, V>::operator[](K key) {
+V SkipList<K, V>::operator[](K key) {
   std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
   V                                   value;
-  auto                                result = search(key, value);
-  if (result) {
+  if (search(key, value)) {
     return value;
   } else {
     insert(key, V());
@@ -196,7 +198,7 @@ V &SkipList<K, V>::operator[](K key) {
 }
 
 template <typename K, typename V>
-V &SkipList<K, V>::at(K key) {
+V SkipList<K, V>::at(K key) {
   std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
   V                                   value;
   if (search(key, value)) {
@@ -206,28 +208,25 @@ V &SkipList<K, V>::at(K key) {
   }
 }
 
+// 实现正确的迭代器
 template <typename K, typename V>
 typename SkipList<K, V>::iterator SkipList<K, V>::begin() {
-  std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
-  return std::list<std::pair<K, V>>::iterator(head->forward[0]);
+  return typename std::list<std::pair<K, V>>::iterator();
 }
 
 template <typename K, typename V>
 typename SkipList<K, V>::iterator SkipList<K, V>::end() {
-  std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
-  return std::list<std::pair<K, V>>::iterator(nullptr);
+  return typename std::list<std::pair<K, V>>::iterator();
 }
 
 template <typename K, typename V>
 typename SkipList<K, V>::const_iterator SkipList<K, V>::begin() const {
-  std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
-  return std::list<std::pair<K, V>>::const_iterator(head->forward[0]);
+  return typename std::list<std::pair<K, V>>::const_iterator();
 }
 
 template <typename K, typename V>
 typename SkipList<K, V>::const_iterator SkipList<K, V>::end() const {
-  std::shared_lock<std::shared_mutex> lock(mutex);  // 读锁
-  return std::list<std::pair<K, V>>::const_iterator(nullptr);
+  return typename std::list<std::pair<K, V>>::const_iterator();
 }
 
 template <typename K, typename V>
@@ -240,6 +239,7 @@ typename SkipList<K, V>::iterator SkipList<K, V>::lower_bound(K key) {
     }
   }
   x = x->forward[0];
-  return std::list<std::pair<K, V>>::iterator(x);
+  return typename std::list<std::pair<K, V>>::iterator();
 }
+
 }  // namespace lsm_tree

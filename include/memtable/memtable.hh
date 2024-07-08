@@ -47,7 +47,7 @@ class MemTable {
   mutable std::shared_mutex     mtx_;
   const DBOptions              *options_;
   std::map<MemKey, std::string> table_;
-  //  更换成跳表
+  //    更换成跳表
   // SkipList<MemKey, std::string> table_;
 };
 

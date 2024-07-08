@@ -26,13 +26,9 @@ TEST_F(SkipListTest, InsertPerformance) {
   }
 
   // Measure performance
-  auto start = chrono::high_resolution_clock::now();
   for (const auto &[key, value] : data) {
     skiplist_->insert(key, value);
   }
-  auto                     end      = chrono::high_resolution_clock::now();
-  chrono::duration<double> duration = end - start;
-  cout << "SkipList insert duration: " << duration.count() << " seconds" << endl;
 }
 
 TEST_F(SkipListTest, SearchPerformance) {
@@ -48,17 +44,8 @@ TEST_F(SkipListTest, SearchPerformance) {
   }
 
   // Measure performance
-  auto   start = chrono::high_resolution_clock::now();
   string value;
   for (const auto &[key, _] : data) {
     skiplist_->search(key, value);
   }
-  auto                     end      = chrono::high_resolution_clock::now();
-  chrono::duration<double> duration = end - start;
-  cout << "SkipList search duration: " << duration.count() << " seconds" << endl;
-}
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
